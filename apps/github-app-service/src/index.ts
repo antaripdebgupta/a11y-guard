@@ -6,7 +6,9 @@ const env = parseEnv();
 const logger = createLogger('github-app-service');
 const app = createApp();
 
-const port = env.GITHUB_APP_SERVICE_PORT || 3002;
+const port = process.env.PORT
+  ? parseInt(process.env.PORT, 10)
+  : env.GITHUB_APP_SERVICE_PORT || 3001;
 
 const server = app.listen(port, () => {
   logger.info(`GitHub App Service listening on port ${port} in ${env.NODE_ENV} mode`);

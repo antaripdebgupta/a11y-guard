@@ -19,6 +19,15 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Debug GitHub App Service",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@a11y-guard/github-app-service", "dev"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Debug Scan Worker",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@a11y-guard/scan-worker", "dev"],
