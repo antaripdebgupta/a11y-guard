@@ -1,0 +1,37 @@
+{
+  "action": "synchronize",
+  "number": 42,
+  "pull_request": {
+    "id": 1001,
+    "number": 42,
+    "state": "open",
+    "title": "Fix accessibility in navbar",
+    "user": {
+      "login": "test-user",
+      "id": 991
+    },
+    "body": "Fixes contrast issues",
+    "head": {
+      "sha": "b2c3d4e5f678901234567890abcdef1234567890",
+      "ref": "fix/a11y-nav"
+    },
+    "base": {
+      "sha": "1234567890abcdef1234567890abcdef12345678",
+      "ref": "main"
+    }
+  },
+  "repository": {
+    "id": 8801,
+    "name": "test-repo",
+    "full_name": "acme/test-repo",
+    "private": false,
+    "owner": {
+      "login": "acme",
+      "id": 551
+    },
+    "default_branch": "main"
+  },
+  "installation": {
+    "id": 12345
+  }
+}

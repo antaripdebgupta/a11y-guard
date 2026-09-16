@@ -1,0 +1,29 @@
+{
+  "action": "created",
+  "deployment_status": {
+    "id": 5001,
+    "state": "success",
+    "target_url": "http://localhost:8080",
+    "description": "Deployment succeeded"
+  },
+  "deployment": {
+    "id": 4001,
+    "sha": "a1b2c3d4e5f678901234567890abcdef12345678",
+    "ref": "fix/a11y-nav",
+    "environment": "preview"
+  },
+  "repository": {
+    "id": 8801,
+    "name": "test-repo",
+    "full_name": "acme/test-repo",
+    "private": false,
+    "owner": {
+      "login": "acme",
+      "id": 551
+    },
+    "default_branch": "main"
+  },
+  "installation": {
+    "id": 12345
+  }
+}

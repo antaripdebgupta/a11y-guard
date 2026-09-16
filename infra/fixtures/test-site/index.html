@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Test Site - Home</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      color: #1a202c;
+      background-color: #ffffff;
+    }
+    header {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+    nav a {
+      color: #2b6cb0;
+      margin-right: 1rem;
+      text-decoration: underline;
+    }
+    main {
+      margin-bottom: 2rem;
+    }
+    button {
+      background-color: #3182ce;
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to Accessible Test Site</h1>
+    <nav aria-label="Main Navigation">
+      <a href="/index.html">Home</a>
+      <a href="/about.html">About & Violations</a>
+    </nav>
+  </header>
+  <main>
+    <h2>Fully Accessible Home Page</h2>
+    <p>This page is structured with semantic HTML5 elements, proper headings, and clean color contrast.</p>
+    <button type="button">Get Started</button>
+  </main>
+  <footer>
+    <p>&copy; 2026 a11y-guard test fixture</p>
+  </footer>
+</body>
+</html>

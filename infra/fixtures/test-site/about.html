@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Inaccessible Test Page</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      color: #e2e8f0; /* Low contrast violation */
+    }
+    .low-contrast {
+      color: #eeeeee;
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <!-- Missing heading structure -->
+    <div>About Page with Intentionally Inaccessible Elements</div>
+    
+    <!-- Image missing alt attribute -->
+    <img src="logo.png">
+
+    <!-- Low contrast text -->
+    <p class="low-contrast">This text fails WCAG color contrast criteria.</p>
+
+    <!-- Button without accessible text -->
+    <button type="button"><i class="icon"></i></button>
+
+    <!-- Form input without label -->
+    <input type="text" id="username">
+  </div>
+</body>
+</html>

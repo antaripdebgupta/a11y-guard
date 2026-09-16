@@ -8,6 +8,7 @@ FROM base AS builder
 WORKDIR /app
 COPY . .
 RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @a11y-guard/db build
 RUN pnpm --filter @a11y-guard/scan-worker build
 
 FROM base AS runner
