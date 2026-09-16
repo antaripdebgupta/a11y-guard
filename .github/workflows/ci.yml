@@ -1,0 +1,85 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: a11y_guard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 12.4.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Prisma DB Migrations
+        env:
+          DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/a11y_guard?schema=public'
+        run: pnpm db:migrate
+
+      - name: Lint Workspace
+        run: pnpm lint
+
+      - name: Typecheck Workspace
+        run: pnpm typecheck
+
+      - name: Run Unit Tests
+        run: pnpm test:unit
+
+      - name: Run Integration Tests
+        env:
+          DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/a11y_guard?schema=public'
+          REDIS_URL: 'redis://localhost:6379'
+        run: pnpm test:integration
+
+      - name: Build All Applications & Packages
+        run: pnpm build
+
+      - name: Upload Coverage Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: code-coverage-report
+          path: coverage/
+          if-no-files-found: ignore

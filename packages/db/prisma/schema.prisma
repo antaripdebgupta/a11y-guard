@@ -1,0 +1,208 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ScanStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum ImpactLevel {
+  CRITICAL
+  SERIOUS
+  MODERATE
+  MINOR
+}
+
+model Organization {
+  id                  String               @id @default(uuid())
+  name                String
+  slug                String               @unique
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  members             OrganizationMember[]
+  installations       Installation[]
+  repositories        Repository[]
+  customRules         CustomRule[]
+  integrations        Integration[]
+  auditLogs           AuditLog[]
+
+  @@map("organizations")
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  name                String?
+  avatarUrl           String?              @map("avatar_url")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  organizationMembers OrganizationMember[]
+  auditLogs           AuditLog[]
+
+  @@map("users")
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  organizationId String       @map("organization_id")
+  userId         String       @map("user_id")
+  role           UserRole     @default(MEMBER)
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model Installation {
+  id                   String       @id @default(uuid())
+  organizationId       String       @map("organization_id")
+  githubInstallationId Int          @unique @map("github_installation_id")
+  accountName          String       @map("account_name")
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("installations")
+}
+
+model Repository {
+  id             String        @id @default(uuid())
+  organizationId String        @map("organization_id")
+  githubRepoId   Int           @unique @map("github_repo_id")
+  name           String
+  fullName       String        @map("full_name")
+  isPrivate      Boolean       @default(false) @map("is_private")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pullRequests PullRequest[]
+  scans        Scan[]
+
+  @@map("repositories")
+}
+
+model PullRequest {
+  id           String     @id @default(uuid())
+  repositoryId String     @map("repository_id")
+  prNumber     Int        @map("pr_number")
+  title        String
+  headSha      String     @map("head_sha")
+  baseSha      String     @map("base_sha")
+  author       String
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  scans      Scan[]
+
+  @@unique([repositoryId, prNumber])
+  @@map("pull_requests")
+}
+
+model Scan {
+  id            String      @id @default(uuid())
+  repositoryId  String      @map("repository_id")
+  pullRequestId String?     @map("pull_request_id")
+  commitSha     String      @map("commit_sha")
+  status        ScanStatus  @default(PENDING)
+  score         Float?
+  startedAt     DateTime?   @map("started_at")
+  completedAt   DateTime?   @map("completed_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  repository  Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  pullRequest PullRequest? @relation(fields: [pullRequestId], references: [id], onDelete: SetNull)
+  pages       ScanPage[]
+  violations  Violation[]
+
+  @@map("scans")
+}
+
+model ScanPage {
+  id        String   @id @default(uuid())
+  scanId    String   @map("scan_id")
+  url       String
+  title     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  scan       Scan        @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  violations Violation[]
+
+  @@map("scan_pages")
+}
+
+model Violation {
+  id             String      @id @default(uuid())
+  scanId         String      @map("scan_id")
+  scanPageId     String?     @map("scan_page_id")
+  ruleId         String      @map("rule_id")
+  impact         ImpactLevel
+  description    String
+  helpUrl        String?     @map("help_url")
+  htmlSnippet    String?     @map("html_snippet")
+  targetSelector String?     @map("target_selector")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  scan     Scan      @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  scanPage ScanPage? @relation(fields: [scanPageId], references: [id], onDelete: SetNull)
+
+  @@map("violations")
+}
+
+model CustomRule {
+  id             String       @id @default(uuid())
+  organizationId String       @map("organization_id")
+  code           String
+  description    String
+  isEnabled      Boolean      @default(true) @map("is_enabled")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("custom_rules")
+}
+
+model Integration {
+  id             String       @id @default(uuid())
+  organizationId String       @map("organization_id")
+  type           String
+  config         Json
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("integrations")
+}
+
+model AuditLog {
+  id             String       @id @default(uuid())
+  organizationId String       @map("organization_id")
+  userId         String?      @map("user_id")
+  action         String
+  metadata       Json
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}

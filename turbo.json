@@ -1,0 +1,52 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "GITHUB_APP_SERVICE_PORT",
+    "WEB_PORT",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "MINIO_ENDPOINT",
+    "MINIO_PORT",
+    "MINIO_ACCESS_KEY",
+    "MINIO_SECRET_KEY",
+    "MINIO_BUCKET",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "GITHUB_APP_ID",
+    "GITHUB_APP_PRIVATE_KEY_PATH",
+    "GITHUB_WEBHOOK_SECRET",
+    "CORS_ORIGIN"
+  ],
+  "ui": "stream",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!-next/cache/**", "dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "test:unit": {
+      "dependsOn": ["^build"]
+    },
+    "test:integration": {
+      "dependsOn": ["^build"]
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

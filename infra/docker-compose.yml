@@ -1,0 +1,105 @@
+# Local Infrastructure Docker Compose Stack for Accessibility CI/CD Platform (Phase 0)
+
+services:
+  # Primary relational database
+  postgres:
+    image: postgres:16-alpine
+    container_name: a11y_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: a11y_guard
+    ports:
+      # Exposed locally for Prisma CLI and local API service access
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d a11y_guard']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis in-memory cache and BullMQ job queue broker
+  redis:
+    image: redis:7-alpine
+    container_name: a11y_redis
+    restart: unless-stopped
+    ports:
+      # Exposed locally for BullMQ worker and cache access
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # S3-compatible local object storage for scan artifacts and reports
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: a11y_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      # S3 API endpoint (9000), MinIO Web Console (9001)
+      - '${MINIO_PORT:-9000}:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:9000/minio/health/live || exit 1']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # One-shot bucket initialization for MinIO
+  createbuckets:
+    image: quay.io/minio/mc:latest
+    container_name: a11y_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 $${MINIO_ACCESS_KEY:-minioadmin} $${MINIO_SECRET_KEY:-minioadmin};
+      /usr/bin/mc mb myminio/$${MINIO_BUCKET:-artifacts} --ignore-existing;
+      /usr/bin/mc anonymous set download myminio/$${MINIO_BUCKET:-artifacts};
+      exit 0;
+      "
+
+  # Catch outbound emails locally (Mailpit / Mailhog replacement)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: a11y_mailpit
+    restart: unless-stopped
+    ports:
+      # SMTP server (1025), Web UI (8025)
+      - '${SMTP_PORT:-1025}:1025'
+      - '8025:8025'
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+    volumes:
+      - mailpit_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'nc -z localhost 8025 || exit 1']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    name: a11y_postgres_data
+  redis_data:
+    name: a11y_redis_data
+  minio_data:
+    name: a11y_minio_data
+  mailpit_data:
+    name: a11y_mailpit_data

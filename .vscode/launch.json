@@ -1,0 +1,46 @@
+// VS Code Debugging Configurations
+// Mapping of Debug Configurations to npm scripts:
+// - "Debug API": maps to `pnpm --filter @a11y-guard/api dev` (runs tsx watch src/index.ts with node inspector enabled)
+// - "Debug Scan Worker": maps to `pnpm --filter @a11y-guard/scan-worker dev`
+// - "Debug Current Vitest File": runs `pnpm vitest run ${file}` under node debugger
+// - "Debug Next.js (Web)": launches Chrome against local Next.js server running via `pnpm --filter @a11y-guard/web dev`
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug API",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@a11y-guard/api", "dev"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Scan Worker",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@a11y-guard/scan-worker", "dev"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Current Vitest File",
+      "autoAttachChildProcesses": true,
+      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${relativeFile}"],
+      "smartStep": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Next.js (Web)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceRoot}/apps/web"
+    }
+  ]
+}
