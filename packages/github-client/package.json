@@ -1,5 +1,5 @@
 {
-  "name": "@a11y-guard/shared-types",
+  "name": "@a11y-guard/github-client",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
@@ -13,7 +13,10 @@
     "test:integration": "vitest run"
   },
   "dependencies": {
-    "zod": "^3.25.76"
+    "@a11y-guard/db": "workspace:*",
+    "@a11y-guard/logger": "workspace:*",
+    "@a11y-guard/shared-types": "workspace:*",
+    "octokit": "^4.1.2"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

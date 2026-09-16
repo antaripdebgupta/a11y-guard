@@ -1,6 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma, ImpactLevel } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+
+export { PrismaClient, Prisma, ImpactLevel };
 
 declare global {
   // eslint-disable-next-line no-var

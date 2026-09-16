@@ -19,6 +19,7 @@ export const envSchema = z.object({
   SMTP_PORT: z.string().transform(Number).default('1025'),
   GITHUB_APP_ID: z.string().min(1).default('123456'),
   GITHUB_APP_PRIVATE_KEY_PATH: z.string().min(1).default('./github-app-private-key.pem'),
+  GITHUB_APP_PRIVATE_KEY: z.string().optional(),
   GITHUB_WEBHOOK_SECRET: z.string().min(1).default('dev_webhook_secret_do_not_use_in_prod'),
   CORS_ORIGIN: z.string().min(1).default('http://localhost:3000'),
 });
