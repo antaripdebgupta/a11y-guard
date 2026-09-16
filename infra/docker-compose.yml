@@ -1,4 +1,4 @@
-# Local Infrastructure Docker Compose Stack for Accessibility CI/CD Platform (Phase 0)
+# Local Infrastructure Docker Compose Stack for Accessibility CI/CD Platform (Phase 1)
 
 services:
   # Primary relational database
@@ -11,7 +11,6 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: a11y_guard
     ports:
-      # Exposed locally for Prisma CLI and local API service access
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -27,7 +26,6 @@ services:
     container_name: a11y_redis
     restart: unless-stopped
     ports:
-      # Exposed locally for BullMQ worker and cache access
       - '6379:6379'
     volumes:
       - redis_data:/data
@@ -37,7 +35,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # S3-compatible local object storage for scan artifacts and reports
+  # S3-compatible local object storage for scan artifacts
   minio:
     image: quay.io/minio/minio:latest
     container_name: a11y_minio
@@ -47,7 +45,6 @@ services:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
     ports:
-      # S3 API endpoint (9000), MinIO Web Console (9001)
       - '${MINIO_PORT:-9000}:9000'
       - '9001:9001'
     volumes:
@@ -73,13 +70,12 @@ services:
       exit 0;
       "
 
-  # Catch outbound emails locally (Mailpit / Mailhog replacement)
+  # Catch outbound emails locally
   mailpit:
     image: axllent/mailpit:latest
     container_name: a11y_mailpit
     restart: unless-stopped
     ports:
-      # SMTP server (1025), Web UI (8025)
       - '${SMTP_PORT:-1025}:1025'
       - '8025:8025'
     environment:
@@ -93,6 +89,58 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  # GitHub App Service
+  github-app-service:
+    build:
+      context: ..
+      dockerfile: apps/github-app-service/Dockerfile
+    container_name: a11y_github_app_service
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      PORT: '3001'
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/a11y_guard
+      REDIS_URL: redis://redis:6379
+      GITHUB_WEBHOOK_SECRET: development_webhook_secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Scan Worker Service
+  scan-worker:
+    build:
+      context: ..
+      dockerfile: apps/scan-worker/Dockerfile
+    container_name: a11y_scan_worker
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/a11y_guard
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+      S3_BUCKET_NAME: artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # Fixture HTML test site for local end-to-end accessibility scans
+  test-site:
+    image: nginx:alpine
+    container_name: a11y_test_site
+    restart: unless-stopped
+    ports:
+      - '8080:80'
+    volumes:
+      - ./fixtures/test-site:/usr/share/nginx/html:ro
 
 volumes:
   postgres_data:
