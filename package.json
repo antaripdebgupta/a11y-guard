@@ -1,0 +1,46 @@
+{
+  "name": "a11y-guard-monorepo",
+  "private": true,
+  "packageManager": "pnpm@12.4.2",
+  "scripts": {
+    "dev": "dotenv -- turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "dotenv -- turbo test",
+    "test:unit": "dotenv -- turbo test:unit",
+    "test:integration": "dotenv -- turbo test:integration",
+    "test:coverage": "dotenv -- turbo test:coverage",
+    "db:migrate": "dotenv -- pnpm --filter @a11y-guard/db db:migrate",
+    "db:migrate:dev": "dotenv -- pnpm --filter @a11y-guard/db db:migrate:dev",
+    "db:seed": "dotenv -- pnpm --filter @a11y-guard/db db:seed",
+    "db:studio": "dotenv -- pnpm --filter @a11y-guard/db db:studio",
+    "db:generate": "pnpm --filter @a11y-guard/db db:generate",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@types/node": "^26.5.1",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}
