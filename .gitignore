@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build artifacts & output
+dist/
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# Turbo cache
+.turbo/
+
+# Coverage
+coverage/
+
+# Environment files & secrets
+.env
+.env.local
+.env.production
+.env.development
+*.pem
+*.key
+
+# Operating system / IDE
+.DS_Store
+Thumbs.db
+*.log
