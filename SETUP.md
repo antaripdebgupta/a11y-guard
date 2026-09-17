@@ -28,18 +28,30 @@ cp .env.example .env
 # 3. Install dependencies (also sets up Husky git hooks via `prepare` script)
 pnpm install
 
-# 4. Start local infrastructure (Postgres, Redis, MinIO, Mailhog)
-docker compose -f infra/docker-compose.yml up -d
+# 4. Start everything — infra + all app services (API, Web, GitHub App, Scan Worker)
+docker compose -f infra/docker-compose.yml up -d --build
 
 # 5. Run database migrations and seed data
 pnpm db:migrate
 pnpm db:seed
 ```
 
-You're done. Verify everything works:
+You're done. All services are running via Docker Compose — no need to run `pnpm dev` separately.
+
+Verify everything works:
 
 ```bash
-pnpm dev         # Starts all services via Turborepo
+curl http://localhost:3000          # Web dashboard
+curl http://localhost:3001/api/v1/healthz  # API
+curl http://localhost:3002/api/v1/healthz  # GitHub App Service
+```
+
+> **💡 Prefer hot-reloading during development?** You can still use `pnpm dev` (Turborepo)
+> instead of Docker for the app services while keeping the infra containers running.
+
+Other useful commands:
+
+```bash
 pnpm lint        # ESLint across workspace
 pnpm typecheck   # tsc --noEmit across workspace
 pnpm test        # Vitest unit + integration tests

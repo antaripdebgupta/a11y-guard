@@ -17,10 +17,10 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 appuser
 
-COPY --from=builder /app/package.json /app/pnpm-workspace.yaml ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/scan-worker /app/apps/scan-worker
-COPY --from=builder /app/packages /app/packages
+COPY --chown=appuser:nodejs --from=builder /app/package.json /app/pnpm-workspace.yaml ./
+COPY --chown=appuser:nodejs --from=builder /app/node_modules ./node_modules
+COPY --chown=appuser:nodejs --from=builder /app/apps/scan-worker /app/apps/scan-worker
+COPY --chown=appuser:nodejs --from=builder /app/packages /app/packages
 
 USER appuser
 

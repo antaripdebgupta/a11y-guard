@@ -90,7 +90,33 @@ services:
       timeout: 5s
       retries: 5
 
-  # GitHub App Service
+  # Core REST API
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    container_name: a11y_api
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      PORT: '3001'
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/a11y_guard
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: '9000'
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-artifacts}
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # GitHub App Service (webhook receiver)
   github-app-service:
     build:
       context: ..
@@ -98,12 +124,13 @@ services:
     container_name: a11y_github_app_service
     restart: unless-stopped
     ports:
-      - '3001:3001'
+      - '3002:3002'
     environment:
-      PORT: '3001'
+      PORT: '3002'
+      NODE_ENV: production
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/a11y_guard
       REDIS_URL: redis://redis:6379
-      GITHUB_WEBHOOK_SECRET: development_webhook_secret
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET:-development_webhook_secret}
     depends_on:
       postgres:
         condition: service_healthy
@@ -130,6 +157,22 @@ services:
       redis:
         condition: service_healthy
       minio:
+        condition: service_healthy
+
+  # Next.js Web Dashboard
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+    container_name: a11y_web
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: '3000'
+      NODE_ENV: production
+    depends_on:
+      api:
         condition: service_healthy
 
   # Fixture HTML test site for local end-to-end accessibility scans

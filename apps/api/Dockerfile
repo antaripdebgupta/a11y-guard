@@ -8,6 +8,7 @@ FROM base AS builder
 WORKDIR /app
 COPY . .
 RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @a11y-guard/db build
 RUN pnpm --filter @a11y-guard/api build
 
 FROM base AS runner
@@ -17,10 +18,10 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 appuser
 
-COPY --from=builder /app/package.json /app/pnpm-workspace.yaml ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/api /app/apps/api
-COPY --from=builder /app/packages /app/packages
+COPY --chown=appuser:nodejs --from=builder /app/package.json /app/pnpm-workspace.yaml ./
+COPY --chown=appuser:nodejs --from=builder /app/node_modules ./node_modules
+COPY --chown=appuser:nodejs --from=builder /app/apps/api /app/apps/api
+COPY --chown=appuser:nodejs --from=builder /app/packages /app/packages
 
 USER appuser
 
