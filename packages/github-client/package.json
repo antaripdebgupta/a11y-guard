@@ -16,7 +16,7 @@
     "@a11y-guard/db": "workspace:*",
     "@a11y-guard/logger": "workspace:*",
     "@a11y-guard/shared-types": "workspace:*",
-    "octokit": "^4.1.2"
+    "octokit": "^5.0.5"
   },
   "devDependencies": {
     "typescript": "^5.7.2",
