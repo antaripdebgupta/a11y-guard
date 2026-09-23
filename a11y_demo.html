@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accessibility Test Page</title>
+</head>
+<body>
+
+    <h1>Welcome to the Demo Page</h1>
+
+    <!-- VIOLATION 1: Image missing an 'alt' attribute (WCAG 1.1.1) -->
+    <img src="hero-banner.jpg">
+
+    <!-- VIOLATION 2: Empty link with no descriptive text (WCAG 2.4.4) -->
+    <a href="https://example.com"></a>
+
+    <!-- VIOLATION 3: Low color contrast text (WCAG 1.4.3) -->
+    <p style="color: #999999; background-color: #ffffff;">This text is too light to read easily.</p>
+
+</body>
+</html>
