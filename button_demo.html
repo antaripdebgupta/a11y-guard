@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Button Violation</title>
+</head>
+<body>
+
+    <!-- VIOLATION: Icon-only button with no accessible text label (WCAG 1.1.1 / 4.1.2) -->
+    <!-- Screen readers will only announce the word "button", leaving users blind to its action -->
+    <button onclick="deleteItem()">
+        <svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+    </button>
+
+</body>
+</html>
