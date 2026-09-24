@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Elements Accessibility Test</title>
+</head>
+<body>
+
+    <h1>Interactive Violations</h1>
+
+    <!-- VIOLATION 1: Non-interactive element acting as a button (WCAG 2.1.1) -->
+    <!-- It has no keyboard focus and won't trigger on 'Enter' or 'Space' for keyboard users -->
+    <div onclick="alert('Submitted!')" style="cursor: pointer; background: blue; color: white; padding: 10px;">
+        Submit Form
+    </div>
+
+    <!-- VIOLATION 2: Video/Audio missing captions or track descriptions (WCAG 1.2.2) -->
+    <video src="promo-video.mp4" controls></video>
+
+    <!-- VIOLATION 3: Missing ARIA attributes on abstract elements (WCAG 4.1.2) -->
+    <!-- Screen readers will read this as a generic group, not an expandable menu -->
+    <div class="custom-dropdown" onclick="toggleMenu()">
+        <span>Options Menu</span>
+    </div>
+
+</body>
+</html>
