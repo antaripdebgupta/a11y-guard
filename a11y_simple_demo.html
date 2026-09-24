@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Violation Page</title>
+</head>
+<body>
+
+    <!-- VIOLATION 1: Missing 'lang' attribute on <html> tag (WCAG 3.1.1) -->
+    <!-- Screen readers won't know which accent or dictionary synthesizer to load -->
+
+    <!-- VIOLATION 2: Image button missing descriptive text (WCAG 1.1.1 / 4.1.2) -->
+    <!-- Screen readers will read "Button" with no explanation of what clicking it does -->
+    <button onclick="closeModal()">
+        <img src="close-icon.svg">
+    </button>
+
+</body>
+</html>

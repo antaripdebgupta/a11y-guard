@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Content Accessibility Test</title>
+</head>
+<body>
+
+    <h1>Dynamic Content Violations</h1>
+
+    <!-- VIOLATION 1: Dynamic alert injection without an ARIA Live Region (WCAG 4.1.3) -->
+    <!-- Screen readers will not announce this content change when it appears via JavaScript -->
+    <div id="status-message" style="background: lightgreen; padding: 10px;">
+        Success: Your profile has been updated!
+    </div>
+
+    <!-- VIOLATION 2: Fixed orientation lock via styling or meta tags (WCAG 1.3.4) -->
+    <!-- Forcing viewport restrictions prevents users with mounted wheelchair tablets from rotating -->
+    <div style="transform: rotate(90deg); height: 100vh; width: 100vw;">
+        Forced Landscape Display Content
+    </div>
+
+    <!-- VIOLATION 3: Moving or auto-updating banner without controls (WCAG 2.2.2) -->
+    <!-- Infinite animations or flashing text distracts users with cognitive or attention deficits -->
+    <marquee scrollamount="10">Breaking News: Core platform update arriving tonight!</marquee>
+
+</body>
+</html>
